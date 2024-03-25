@@ -1,0 +1,3020 @@
+-- |Suslik Hub|
+local menu = Instance.new("ScreenGui")
+menu.Parent = game.Players.LocalPlayer.PlayerGui
+
+local frame99 = Instance.new("Frame")
+frame99.Size = UDim2.new(0, 70, 0, 70)
+frame99.Position = UDim2.new(0.5, 300, 0.5, -160)
+frame99.BackgroundColor3 = Color3.new(0, 0, 0)
+frame99.BorderColor3 = Color3.new(1, 1, 1)
+frame99.BorderSizePixel = 2
+frame99.BackgroundTransparency = 0.2
+frame99.Parent = menu
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = frame99
+
+local imageLabel99 = Instance.new("ImageLabel")
+imageLabel99.Size = UDim2.new(0, 70, 0, 70)
+imageLabel99.Position = UDim2.new(0, 0, 0, 0)
+imageLabel99.BackgroundTransparency = 1
+imageLabel99.Image = "rbxassetid://16807904361"
+imageLabel99.Parent = frame99
+
+local menu = Instance.new("ScreenGui")
+menu.Name = "ToggleMenuGui"
+menu.Parent = game.Players.LocalPlayer.PlayerGui
+
+local frame1 = Instance.new("Frame")
+frame1.Size = UDim2.new(0, 500, 0, 260)
+frame1.Position = UDim2.new(0.5, -250, 0.5, -170)
+frame1.BackgroundColor3 = Color3.new(0, 0, 0)
+frame1.BorderColor3 = Color3.new(192, 192, 192)
+frame1.BorderSizePixel = 2
+frame1.BackgroundTransparency = 0.2
+frame1.Parent = menu
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = frame1
+
+local plrs = game:FindFirstChildOfClass("Players")
+local lp = plrs.LocalPlayer
+local ws = game:FindFirstChildOfClass("Workspace")
+local uis = game:FindFirstChildOfClass("UserInputService")
+local rs = game:FindFirstChildOfClass("RunService")
+local heartbeat = rs.Heartbeat
+local renderstepped = rs.RenderStepped
+local angles = CFrame.Angles
+local cf = CFrame.new
+local v3 = Vector3.new
+local v3_010 = v3(0, 1, 0)
+local v3_0 = v3(0, 0, 0)
+local osclock = os.clock
+local twait = task.wait
+local slower = string.lower
+local ssub = string.sub
+
+local speeding = 32
+local maxspeed = 75
+local off = angles(-1.5707963267948966, 0, 0)
+
+local function gp(p, n, cl)
+    if typeof(p) == "Instance" then
+        local c = p:GetChildren()
+        for i = 1, #c do
+            local v = c[i]
+            if (v.Name == n) and v:IsA(cl) then
+                return v
+            end
+        end
+    end
+    return nil
+end
+
+local i = Instance.new
+local v2 = Vector2.new
+local bc = BrickColor.new
+local c3 = Color3.new
+local u2 = UDim2.new
+local sc, mr = string.char, math.random
+local function rs(l)
+    l = l or mr(8, 15)
+    local s = ""
+    for i = 1, l do
+        if mr(1, 2) == 1 then
+            s = s .. sc(mr(65, 90))
+        else
+            s = s .. sc(mr(97, 122))
+        end
+    end
+    return s
+end
+
+local e = Enum
+local function Draggable(window, obj)
+    local MB1enum = e.UserInputType.MouseButton1
+    local TOUCHenum = e.UserInputType.Touch
+    obj = obj or window
+    local activeEntered = 0
+    local mouseStart = nil
+    local dragStart = nil
+    local inputbegancon = nil
+    local rendersteppedcon = nil
+    local inputendedcon = nil
+    local function inputendedf(a)
+        a = a.UserInputType
+        if (a == MB1enum) or (a == TOUCHenum) then
+            rendersteppedcon:Disconnect()
+            inputendedcon:Disconnect()
+        end
+    end
+    local function rendersteppedf()
+        local off = uis:GetMouseLocation() - mouseStart
+        window.Position = dragStart + u2(0, off.X, 0, off.Y)
+    end
+    local function inputbeganf(a)
+        a = a.UserInputType
+        if ((a == MB1enum) or (a == TOUCHenum)) and (activeEntered == 0) and not uis:GetFocusedTextBox() then
+            mouseStart = uis:GetMouseLocation()
+            dragStart = window.Position
+            if rendersteppedcon then
+                rendersteppedcon:Disconnect()
+            end
+            rendersteppedcon = renderstepped:Connect(rendersteppedf)
+            if inputendedcon then
+                inputendedcon:Disconnect()
+            end
+            inputendedcon = uis.InputEnded:Connect(inputendedf)
+        end
+    end
+    obj.MouseEnter:Connect(
+        function()
+            if inputbegancon then
+                inputbegancon:Disconnect()
+            end
+            inputbegancon = uis.InputBegan:Connect(inputbeganf)
+        end
+    )
+    obj.MouseLeave:Connect(
+        function()
+            inputbegancon:Disconnect()
+        end
+    )
+    local function ondes(d)
+        if d:IsA("GuiObject") then
+            local thisEntered = false
+            local thisAdded = false
+            local con0 =
+                d.MouseEnter:Connect(
+                function()
+                    thisEntered = true
+                    if (not thisAdded) and d.Active then
+                        activeEntered = activeEntered + 1
+                        thisAdded = true
+                    end
+                end
+            )
+            local con1 =
+                d.MouseLeave:Connect(
+                function()
+                    thisEntered = false
+                    if thisAdded then
+                        activeEntered = activeEntered - 1
+                        thisAdded = false
+                    end
+                end
+            )
+            local con2 =
+                d:GetPropertyChangedSignal("Active"):Connect(
+                function()
+                    if thisEntered then
+                        if thisAdded and not d.Active then
+                            activeEntered = activeEntered - 1
+                            thisAdded = false
+                        elseif d.Active and not thisAdded then
+                            activeEntered = activeEntered + 1
+                            thisAdded = true
+                        end
+                    end
+                end
+            )
+            local con3 = nil
+            con3 =
+                d.AncestryChanged:Connect(
+                function()
+                    if not d:IsDescendantOf(window) then
+                        if thisEntered then
+                            activeEntered = activeEntered - 1
+                        end
+                        con0:Disconnect()
+                        con1:Disconnect()
+                        con2:Disconnect()
+                        con3:Disconnect()
+                    end
+                end
+            )
+        end
+    end
+    window.DescendantAdded:Connect(ondes)
+    local des = window:GetDescendants()
+    for i = 1, #des do
+        ondes(des[i])
+    end
+end
+Draggable(frame1)
+
+local others = {}
+for i, v in pairs(plrs:GetPlayers()) do
+    if v ~= lp then
+        others[v] = true
+    end
+end
+
+Draggable(frame99)
+
+local others = {}
+for i, v in pairs(plrs:GetPlayers()) do
+    if v ~= lp then
+        others[v] = true
+    end
+end
+
+local iscg, _ =
+    pcall(
+    function()
+        menu.Parent = game:FindFirstChildOfClass("CoreGui")
+    end
+)
+if not iscg then
+    menu.Parent = lp:FindFirstChildOfClass("PlayerGui")
+end
+
+local noiseTexture = Instance.new("ImageLabel")
+noiseTexture.Size = UDim2.new(1, 0, 1, 0)
+noiseTexture.BackgroundTransparency = 1
+noiseTexture.Image = "rbxassetid://16749780649"
+noiseTexture.Parent = frame1
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = noiseTexture
+
+local frame2 = Instance.new("Frame")
+frame2.Size = UDim2.new(0, 495.9, 0, 0)
+frame2.Position = UDim2.new(0.5, -248, 0.5, -90)
+frame2.BackgroundColor3 = Color3.new(0, 0, 0)
+frame2.BorderColor3 = Color3.new(1, 1, 1)
+frame2.BorderSizePixel = 2
+frame2.BackgroundTransparency = 0.2
+frame2.Parent = frame1
+
+local frame3 = Instance.new("Frame")
+frame3.Size = UDim2.new(0, 0, 0, 215)
+frame3.Position = UDim2.new(0.5, -140, 0.5, -87)
+frame3.BackgroundColor3 = Color3.new(0, 0, 0)
+frame3.BorderColor3 = Color3.new(1, 1, 1)
+frame3.BorderSizePixel = 2
+frame3.BackgroundTransparency = 0.2
+frame3.Parent = frame1
+
+local frame4 = Instance.new("Frame")
+frame4.Size = UDim2.new(0, 0, 0, 35)
+frame4.Position = UDim2.new(0.5, -70, 0.5, -128)
+frame4.BackgroundColor3 = Color3.new(0, 0, 0)
+frame4.BorderColor3 = Color3.new(1, 1, 1)
+frame4.BorderSizePixel = 2
+frame4.BackgroundTransparency = 0.2
+frame4.Parent = frame1
+
+local frame5 = Instance.new("Frame")
+frame5.Size = UDim2.new(0, 0, 0, 215)
+frame5.Position = UDim2.new(0.5, 47, 0.5, -87)
+frame5.BackgroundColor3 = Color3.new(0, 0, 0)
+frame5.BorderColor3 = Color3.new(1, 1, 1)
+frame5.BorderSizePixel = 2
+frame5.BackgroundTransparency = 0.2
+frame5.Visible = false
+frame5.Parent = frame1
+
+local gui = game.Players.LocalPlayer.PlayerGui
+local textLabel = Instance.new("TextLabel", gui.ScreenGui)
+textLabel.Size = UDim2.new(1, 0, 0, 50)
+textLabel.Position = UDim2.new(0, -160, 0.5, -135)
+textLabel.Text = "Suslik Hub"
+textLabel.TextSize = 26
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.BackgroundTransparency = 1
+textLabel.Parent = frame1
+
+local gui = game.Players.LocalPlayer.PlayerGui
+local textLabel = Instance.new("TextLabel", gui.ScreenGui)
+textLabel.Size = UDim2.new(1, 0, 0, 50)
+textLabel.Position = UDim2.new(0, 90, 0.5, -135)
+textLabel.Text = "Lumber Tycoon 2" --Любое название игры на которую скрипт
+textLabel.TextSize = 15
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.BackgroundTransparency = 10
+textLabel.Parent = frame1
+
+local gui = game.Players.LocalPlayer.PlayerGui
+local textLabel = Instance.new("TextLabel", gui.ScreenGui)
+textLabel.Size = UDim2.new(1, 0, 0, 50)
+textLabel.Position = UDim2.new(0, -30, 0.5, -145)
+textLabel.Text = identifyexecutor()
+textLabel.TextSize = 14
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.BackgroundTransparency = 1
+textLabel.Parent = frame1
+
+local function createTabButton(text, position)
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(0, 100, 0, 25)
+    tabButton.Text = text
+    tabButton.TextColor3 = Color3.new(64, 64, 64)
+    tabButton.Position = position
+    tabButton.Parent = frame1
+    tabButton.Style = Enum.ButtonStyle.RobloxButton
+    tabButton.BackgroundTransparency = 0.2
+    tabButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    return tabButton
+end
+
+local function createButtonBelow(text, parent, previousButton)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 100, 0, 30)
+    button.Position = UDim2.new(0.5, -135, 0, 45)
+    button.Text = text
+    button.TextColor3 = Color3.new(64, 64, 64)
+    button.Style = Enum.ButtonStyle.RobloxButton
+    button.Parent = parent
+    if previousButton then
+        button.Position =
+            UDim2.new(0.5, -135, 0, 5 + previousButton.AbsolutePosition.Y + previousButton.AbsoluteSize.Y + 3)
+    end
+    return button
+end
+
+-- tab2
+
+local jButton = createButtonBelow("Speed and Jump Script", frame1)
+jButton.Size = UDim2.new(0, 175, 0, 23)
+jButton.TextSize = 10
+jButton.Visible = false
+
+jButton.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-WalkSpeed-and-PowerJamp-Suslik-Hub-/main/KrutoySuslik"
+            )
+        )()
+    end
+)
+
+local wButton = createButtonBelow("Anti-AFK", frame1)
+wButton.Size = UDim2.new(0, 175, 0, 23)
+wButton.Position = UDim2.new(0.5, -135, 0, 68)
+wButton.TextSize = 10
+wButton.Visible = false
+
+wButton.MouseButton1Click:Connect(
+    function()
+        local VirtualInputManager = game:GetService("VirtualInputManager")
+        while task.wait() do
+            VirtualInputManager:SendKeyEvent(true, "Space", false, game)
+            task.wait(.2)
+            VirtualInputManager:SendKeyEvent(false, "Space", false, game)
+            task.wait(300)
+        end
+    end
+)
+
+local v2Button = createButtonBelow("Night Vision", frame1)
+v2Button.Size = UDim2.new(0, 175, 0, 23)
+v2Button.Position = UDim2.new(0.5, -135, 0, 93)
+v2Button.TextSize = 10
+v2Button.Visible = false
+
+v2Button.MouseButton1Click:Connect(
+    function()
+        local Light = game:GetService("Lighting")
+
+        function dofullbright()
+            Light.Ambient = Color3.new(1, 1, 1)
+
+            Light.ColorShift_Bottom = Color3.new(1, 1, 1)
+
+            Light.ColorShift_Top = Color3.new(1, 1, 1)
+        end
+
+        dofullbright()
+
+        Light.LightingChanged:Connect(dofullbright)
+    end
+)
+
+local oButton = createButtonBelow("Anti-Lag", frame1)
+oButton.Size = UDim2.new(0, 175, 0, 23)
+oButton.Position = UDim2.new(0.5, -135, 0, 118)
+oButton.TextSize = 10
+oButton.Visible = false
+
+oButton.MouseButton1Click:Connect(
+    function()
+        local ToDisable = {
+            Textures = false,
+            VisualEffects = true,
+            Parts = true,
+            Particles = true,
+            Sky = true
+        }
+
+        local ToEnable = {
+            FullBright = false
+        }
+
+        local Stuff = {}
+
+        for _, v in next, game:GetDescendants() do
+            if ToDisable.Parts then
+                if v:IsA("Part") or v:IsA("Union") or v:IsA("BasePart") then
+                    v.Material = Enum.Material.SmoothPlastic
+                    table.insert(Stuff, 1, v)
+                end
+            end
+
+            if ToDisable.Particles then
+                if
+                    v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Explosion") or v:IsA("Sparkles") or
+                        v:IsA("Fire")
+                 then
+                    v.Enabled = false
+                    table.insert(Stuff, 1, v)
+                end
+            end
+
+            if ToDisable.VisualEffects then
+                if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
+                    v.Enabled = false
+                    table.insert(Stuff, 1, v)
+                end
+            end
+
+            if ToDisable.Textures then
+                if v:IsA("Decal") or v:IsA("Texture") then
+                    v.Texture = ""
+                    table.insert(Stuff, 1, v)
+                end
+            end
+
+            if ToDisable.Sky then
+                if v:IsA("Sky") then
+                    v.Parent = nil
+                    table.insert(Stuff, 1, v)
+                end
+            end
+        end
+    end
+)
+
+local piButton = createButtonBelow("ESP Gui", frame1)
+piButton.Size = UDim2.new(0, 175, 0, 23)
+piButton.Position = UDim2.new(0.5, -135, 0, 143)
+piButton.TextSize = 10
+piButton.Visible = false
+
+piButton.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-ESP-Suslik-Hub-/main/ESP-KrutoySuslik-SuslikHub",
+                true
+            )
+        )()
+    end
+)
+
+local poButton = createButtonBelow("BTools and BTools+", frame1)
+poButton.Size = UDim2.new(0, 175, 0, 23)
+poButton.Position = UDim2.new(0.5, -135, 0, 168)
+poButton.TextSize = 10
+poButton.Visible = false
+
+poButton.MouseButton1Click:Connect(
+    function()
+        loadstring(game:GetObjects("rbxassetid://6695644299")[1].Source)("")
+        loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/BTools.txt"))()
+    end
+)
+
+local rtxButton = createButtonBelow("RTX Gui", frame1)
+rtxButton.Size = UDim2.new(0, 175, 0, 23)
+rtxButton.Position = UDim2.new(0.5, -135, 0, 190)
+rtxButton.TextSize = 10
+rtxButton.Visible = false
+
+rtxButton.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/RTX%20Gui%20Hub%20Obfuscator")
+        )()
+    end
+)
+
+local flyButton = createButtonBelow("Fly Gui", frame1)
+flyButton.Size = UDim2.new(0, 175, 0, 23)
+flyButton.Position = UDim2.new(0.5, -135, 0, 213)
+flyButton.TextSize = 10
+flyButton.Visible = false
+
+flyButton.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet("https://raw.githubusercontent.com/kip1231/proverki/main/Protected_7494382346940781.lua")
+        )()
+    end
+)
+
+local shButton = createButtonBelow("ShiftLock", frame1)
+shButton.Size = UDim2.new(0, 175, 0, 23)
+shButton.Position = UDim2.new(0.5, -135, 0, 235)
+shButton.TextSize = 10
+shButton.Visible = false
+
+shButton.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet("https://raw.githubusercontent.com/MiniNoobie/ShiftLockx/main/Shiftlock-MiniNoobie", true)
+        )()
+    end
+)
+
+local setButton = createButtonBelow("Settings", frame1)
+setButton.Size = UDim2.new(0, 195, 0, 40)
+setButton.Position = UDim2.new(0.5, 53, 0, 45)
+setButton.TextSize = 21
+setButton.Visible = false
+
+local v6Button = createButtonBelow("Border Color", frame1)
+v6Button.Size = UDim2.new(0, 195, 0, 23)
+v6Button.Position = UDim2.new(0.5, 53, 0, 85)
+v6Button.TextSize = 10
+v6Button.Visible = false
+
+local colorButton = createButtonBelow(" ", frame1)
+colorButton.Size = UDim2.new(0, 195, 0, 60)
+colorButton.Position = UDim2.new(0.5, 53, 0, 105)
+colorButton.Visible = false
+
+local col1button = Instance.new("TextButton")
+col1button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col1button.Position = UDim2.new(0.25, 188, 0.25, 50)
+col1button.BackgroundColor3 = Color3.new(1, 1, 1)
+col1button.Text = " "
+col1button.Visible = false
+col1button.Parent = frame1
+
+col1button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(1, 1, 1)
+        frame2.BorderColor3 = Color3.new(1, 1, 1)
+        frame3.BorderColor3 = Color3.new(1, 1, 1)
+        frame4.BorderColor3 = Color3.new(1, 1, 1)
+        frame5.BorderColor3 = Color3.new(1, 1, 1)
+    end
+)
+
+local col2button = Instance.new("TextButton")
+col2button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col2button.Position = UDim2.new(0.25, 218, 0.25, 50)
+col2button.BackgroundColor3 = Color3.new(0, 0, 0)
+col2button.Text = " "
+col2button.Visible = false
+col2button.Parent = frame1
+
+col2button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(0, 0, 0)
+        frame2.BorderColor3 = Color3.new(0, 0, 0)
+        frame3.BorderColor3 = Color3.new(0, 0, 0)
+        frame4.BorderColor3 = Color3.new(0, 0, 0)
+        frame5.BorderColor3 = Color3.new(0, 0, 0)
+    end
+)
+
+local col3button = Instance.new("TextButton")
+col3button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col3button.Position = UDim2.new(0.25, 248, 0.25, 50)
+col3button.BackgroundColor3 = Color3.new(255, 0, 0)
+col3button.Text = " "
+col3button.Visible = false
+col3button.Parent = frame1
+
+col3button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(255, 0, 0)
+        frame2.BorderColor3 = Color3.new(255, 0, 0)
+        frame3.BorderColor3 = Color3.new(255, 0, 0)
+        frame4.BorderColor3 = Color3.new(255, 0, 0)
+        frame5.BorderColor3 = Color3.new(255, 0, 0)
+    end
+)
+
+local col4button = Instance.new("TextButton")
+col4button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col4button.Position = UDim2.new(0.25, 278, 0.25, 50)
+col4button.BackgroundColor3 = Color3.new(0, 0, 255)
+col4button.Text = " "
+col4button.Visible = false
+col4button.Parent = frame1
+
+col4button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(0, 0, 255)
+        frame2.BorderColor3 = Color3.new(0, 0, 255)
+        frame3.BorderColor3 = Color3.new(0, 0, 255)
+        frame4.BorderColor3 = Color3.new(0, 0, 255)
+        frame5.BorderColor3 = Color3.new(0, 0, 255)
+    end
+)
+
+local col5button = Instance.new("TextButton")
+col5button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col5button.Position = UDim2.new(0.25, 308, 0.25, 50)
+col5button.BackgroundColor3 = Color3.new(0, 255, 0)
+col5button.Text = " "
+col5button.Visible = false
+col5button.Parent = frame1
+
+col5button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(0, 255, 0)
+        frame2.BorderColor3 = Color3.new(0, 255, 0)
+        frame3.BorderColor3 = Color3.new(0, 255, 0)
+        frame4.BorderColor3 = Color3.new(0, 255, 0)
+        frame5.BorderColor3 = Color3.new(0, 255, 0)
+    end
+)
+
+local col6button = Instance.new("TextButton")
+col6button.Size = UDim2.new(0.05, 0, 0.1, 15, 0)
+col6button.Position = UDim2.new(0.25, 338, 0.25, 50)
+col6button.BackgroundColor3 = Color3.new(math.random(), math.random(), math.random())
+col6button.Text = " "
+col6button.Visible = false
+col6button.Parent = frame1
+
+col6button.MouseButton1Click:Connect(
+    function()
+        frame1.BorderColor3 = Color3.new(math.random(), math.random(), math.random())
+        frame2.BorderColor3 = Color3.new(math.random(), math.random(), math.random())
+        frame3.BorderColor3 = Color3.new(math.random(), math.random(), math.random())
+        frame4.BorderColor3 = Color3.new(math.random(), math.random(), math.random())
+        frame5.BorderColor3 = Color3.new(math.random(), math.random(), math.random())
+    end
+)
+
+-- tab 3
+
+local lolButton = createButtonBelow("Refinery Caves", frame1)
+lolButton.Size = UDim2.new(0, 175, 0, 23)
+lolButton.TextSize = 10
+lolButton.Visible = false
+
+lolButton.MouseButton1Click:Connect(
+    function()
+        menu:Destroy()
+        frame99:Destroy()
+        wait(1)
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-Suslik-Hub-Refinery-Caves-/main/RefineryCaves.Lua"
+            )
+        )()
+    end
+)
+
+local lol2Button = createButtonBelow("Murderers|Sheriffs", frame1)
+lol2Button.Size = UDim2.new(0, 175, 0, 23)
+lol2Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol2Button.TextSize = 10
+lol2Button.Visible = false
+
+lol2Button.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-Suslik-Hub-Murderers-VS-Sheriffs-Duels/main/Script%20Suslik%20Hub"
+            )
+        )()
+        wait(2)
+        menu:Destroy()
+        frame99:Destroy()
+    end
+)
+
+local lol3Button = createButtonBelow("Doors", frame1)
+lol3Button.Size = UDim2.new(0, 175, 0, 23)
+lol3Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol3Button.TextSize = 10
+lol3Button.Visible = false
+
+lol3Button.MouseButton1Click:Connect(
+    function()
+        menu:Destroy()
+        frame99:Destroy()
+        wait(1)
+        loadstring(
+            game:HttpGet("https://raw.githubusercontent.com/KrutoySuslik/-Suslik-Hub-/main/%7CDoors%20Script%201.1%7C")
+        )()
+    end
+)
+
+local lol4Button = createButtonBelow("Build A Boat", frame1)
+lol4Button.Size = UDim2.new(0, 175, 0, 23)
+lol4Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol4Button.TextSize = 10
+lol4Button.Visible = false
+
+lol4Button.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/build-a-boat-for-treasure/main/%7CSuslik%20Hub%7C%20%7CScript%7C"
+            )
+        )()
+        wait(2)
+        menu:Destroy()
+        frame99:Destroy()
+    end
+)
+
+local lol5Button = createButtonBelow("Pet Simulator 99", frame1)
+lol5Button.Size = UDim2.new(0, 175, 0, 23)
+lol5Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol5Button.TextSize = 10
+lol5Button.Visible = false
+
+lol5Button.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/Pet-Simulator-99-Suslik-Hub/main/Script%20Suslik%20Hub%20PS99"
+            )
+        )()
+        wait(2)
+        menu:Destroy()
+        frame99:Destroy()
+    end
+)
+
+local lol6Button = createButtonBelow("Prison Life Script", frame1)
+lol6Button.Size = UDim2.new(0, 175, 0, 23)
+lol6Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol6Button.TextSize = 10
+lol6Button.Visible = false
+
+lol6Button.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-Prison-Life-/main/%7CSuslik%20Hub%7C%20%7CPrison%20Life%7C"
+            )
+        )()
+        wait(2)
+        menu:Destroy()
+        frame99:Destroy()
+    end
+)
+
+local lol7Button = createButtonBelow("Murder Mystery 2", frame1)
+lol7Button.Size = UDim2.new(0, 175, 0, 23)
+lol7Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol7Button.TextSize = 10
+lol7Button.Visible = false
+
+lol7Button.MouseButton1Click:Connect(
+    function()
+        loadstring(
+            game:HttpGet(
+                "https://raw.githubusercontent.com/KrutoySuslik/-Murder-Mystery-2-/main/Suslik-Hub-Script-KrutoySuslik"
+            )
+        )()
+        wait(2)
+        menu:Destroy()
+        frame99:Destroy()
+    end
+)
+
+local lol8Button = createButtonBelow("8", frame1)
+lol8Button.Size = UDim2.new(0, 175, 0, 23)
+lol8Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol8Button.TextSize = 10
+lol8Button.Visible = false
+
+lol8Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol9Button = createButtonBelow("9", frame1)
+lol9Button.Size = UDim2.new(0, 195, 0, 23)
+lol9Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol9Button.TextSize = 10
+lol9Button.Visible = false
+
+lol9Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol10Button = createButtonBelow("10", frame1)
+lol10Button.Size = UDim2.new(0, 195, 0, 23)
+lol10Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol10Button.TextSize = 10
+lol10Button.Visible = false
+
+lol10Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol11Button = createButtonBelow("11", frame1)
+lol11Button.Size = UDim2.new(0, 195, 0, 23)
+lol11Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol11Button.TextSize = 10
+lol11Button.Visible = false
+
+lol11Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol12Button = createButtonBelow("12", frame1)
+lol12Button.Size = UDim2.new(0, 195, 0, 23)
+lol12Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol12Button.TextSize = 10
+lol12Button.Visible = false
+
+lol12Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol13Button = createButtonBelow("13", frame1)
+lol13Button.Size = UDim2.new(0, 195, 0, 23)
+lol13Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol13Button.TextSize = 10
+lol13Button.Visible = false
+
+lol13Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol14Button = createButtonBelow("14", frame1)
+lol14Button.Size = UDim2.new(0, 195, 0, 23)
+lol14Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol14Button.TextSize = 10
+lol14Button.Visible = false
+
+lol14Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol15Button = createButtonBelow("15", frame1)
+lol15Button.Size = UDim2.new(0, 195, 0, 23)
+lol15Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol15Button.TextSize = 10
+lol15Button.Visible = false
+
+lol15Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol16Button = createButtonBelow("16", frame1)
+lol16Button.Size = UDim2.new(0, 195, 0, 23)
+lol16Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol16Button.TextSize = 10
+lol16Button.Visible = false
+
+lol16Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+-- tab 4
+
+local lol17Button = createButtonBelow("17", frame1)
+lol17Button.Size = UDim2.new(0, 175, 0, 23)
+lol17Button.TextSize = 10
+lol17Button.Visible = false
+
+lol17Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol18Button = createButtonBelow("18", frame1)
+lol18Button.Size = UDim2.new(0, 175, 0, 23)
+lol18Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol18Button.TextSize = 10
+lol18Button.Visible = false
+
+lol18Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol19Button = createButtonBelow("19", frame1)
+lol19Button.Size = UDim2.new(0, 175, 0, 23)
+lol19Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol19Button.TextSize = 10
+lol19Button.Visible = false
+
+lol19Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol20Button = createButtonBelow("20", frame1)
+lol20Button.Size = UDim2.new(0, 175, 0, 23)
+lol20Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol20Button.TextSize = 10
+lol20Button.Visible = false
+
+lol20Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol21Button = createButtonBelow("21", frame1)
+lol21Button.Size = UDim2.new(0, 175, 0, 23)
+lol21Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol21Button.TextSize = 10
+lol21Button.Visible = false
+
+lol21Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol22Button = createButtonBelow("22", frame1)
+lol22Button.Size = UDim2.new(0, 175, 0, 23)
+lol22Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol22Button.TextSize = 10
+lol22Button.Visible = false
+
+lol22Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol23Button = createButtonBelow("23", frame1)
+lol23Button.Size = UDim2.new(0, 175, 0, 23)
+lol23Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol23Button.TextSize = 10
+lol23Button.Visible = false
+
+lol23Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol24Button = createButtonBelow("24", frame1)
+lol24Button.Size = UDim2.new(0, 175, 0, 23)
+lol24Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol24Button.TextSize = 10
+lol24Button.Visible = false
+
+lol24Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol25Button = createButtonBelow("25", frame1)
+lol25Button.Size = UDim2.new(0, 195, 0, 23)
+lol25Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol25Button.TextSize = 10
+lol25Button.Visible = false
+
+lol25Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol26Button = createButtonBelow("26", frame1)
+lol26Button.Size = UDim2.new(0, 195, 0, 23)
+lol26Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol26Button.TextSize = 10
+lol26Button.Visible = false
+
+lol26Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol27Button = createButtonBelow("27", frame1)
+lol27Button.Size = UDim2.new(0, 195, 0, 23)
+lol27Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol27Button.TextSize = 10
+lol27Button.Visible = false
+
+lol27Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol28Button = createButtonBelow("28", frame1)
+lol28Button.Size = UDim2.new(0, 195, 0, 23)
+lol28Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol28Button.TextSize = 10
+lol28Button.Visible = false
+
+lol28Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol29Button = createButtonBelow("29", frame1)
+lol29Button.Size = UDim2.new(0, 195, 0, 23)
+lol29Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol29Button.TextSize = 10
+lol29Button.Visible = false
+
+lol29Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol30Button = createButtonBelow("30", frame1)
+lol30Button.Size = UDim2.new(0, 195, 0, 23)
+lol30Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol30Button.TextSize = 10
+lol30Button.Visible = false
+
+lol30Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol31Button = createButtonBelow("31", frame1)
+lol31Button.Size = UDim2.new(0, 195, 0, 23)
+lol31Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol31Button.TextSize = 10
+lol31Button.Visible = false
+
+lol31Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol32Button = createButtonBelow("32", frame1)
+lol32Button.Size = UDim2.new(0, 195, 0, 23)
+lol32Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol32Button.TextSize = 10
+lol32Button.Visible = false
+
+lol32Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+-- tab 5
+
+local lol33Button = createButtonBelow("33", frame1)
+lol33Button.Size = UDim2.new(0, 175, 0, 23)
+lol33Button.TextSize = 10
+lol33Button.Visible = false
+
+lol33Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol34Button = createButtonBelow("34", frame1)
+lol34Button.Size = UDim2.new(0, 175, 0, 23)
+lol34Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol34Button.TextSize = 10
+lol34Button.Visible = false
+
+lol34Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol35Button = createButtonBelow("35", frame1)
+lol35Button.Size = UDim2.new(0, 175, 0, 23)
+lol35Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol35Button.TextSize = 10
+lol35Button.Visible = false
+
+lol35Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol36Button = createButtonBelow("36", frame1)
+lol36Button.Size = UDim2.new(0, 175, 0, 23)
+lol36Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol36Button.TextSize = 10
+lol36Button.Visible = false
+
+lol36Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol37Button = createButtonBelow("37", frame1)
+lol37Button.Size = UDim2.new(0, 175, 0, 23)
+lol37Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol37Button.TextSize = 10
+lol37Button.Visible = false
+
+lol37Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol38Button = createButtonBelow("38", frame1)
+lol38Button.Size = UDim2.new(0, 175, 0, 23)
+lol38Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol38Button.TextSize = 10
+lol38Button.Visible = false
+
+lol38Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol39Button = createButtonBelow("39", frame1)
+lol39Button.Size = UDim2.new(0, 175, 0, 23)
+lol39Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol39Button.TextSize = 10
+lol39Button.Visible = false
+
+lol39Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol40Button = createButtonBelow("40", frame1)
+lol40Button.Size = UDim2.new(0, 175, 0, 23)
+lol40Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol40Button.TextSize = 10
+lol40Button.Visible = false
+
+lol40Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol41Button = createButtonBelow("41", frame1)
+lol41Button.Size = UDim2.new(0, 195, 0, 23)
+lol41Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol41Button.TextSize = 10
+lol41Button.Visible = false
+
+lol41Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol42Button = createButtonBelow("42", frame1)
+lol42Button.Size = UDim2.new(0, 195, 0, 23)
+lol42Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol42Button.TextSize = 10
+lol42Button.Visible = false
+
+lol42Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol43Button = createButtonBelow("43", frame1)
+lol43Button.Size = UDim2.new(0, 195, 0, 23)
+lol43Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol43Button.TextSize = 10
+lol43Button.Visible = false
+
+lol43Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol44Button = createButtonBelow("44", frame1)
+lol44Button.Size = UDim2.new(0, 195, 0, 23)
+lol44Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol44Button.TextSize = 10
+lol44Button.Visible = false
+
+lol44Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol45Button = createButtonBelow("45", frame1)
+lol45Button.Size = UDim2.new(0, 195, 0, 23)
+lol45Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol45Button.TextSize = 10
+lol45Button.Visible = false
+
+lol45Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol46Button = createButtonBelow("46", frame1)
+lol46Button.Size = UDim2.new(0, 195, 0, 23)
+lol46Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol46Button.TextSize = 10
+lol46Button.Visible = false
+
+lol46Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol47Button = createButtonBelow("47", frame1)
+lol47Button.Size = UDim2.new(0, 195, 0, 23)
+lol47Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol47Button.TextSize = 10
+lol47Button.Visible = false
+
+lol47Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol48Button = createButtonBelow("48", frame1)
+lol48Button.Size = UDim2.new(0, 195, 0, 23)
+lol48Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol48Button.TextSize = 10
+lol48Button.Visible = false
+
+lol48Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+-- tab 6
+
+local lol49Button = createButtonBelow("49", frame1)
+lol49Button.Size = UDim2.new(0, 175, 0, 23)
+lol49Button.TextSize = 10
+lol49Button.Visible = false
+
+lol49Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol50Button = createButtonBelow("50", frame1)
+lol50Button.Size = UDim2.new(0, 175, 0, 23)
+lol50Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol50Button.TextSize = 10
+lol50Button.Visible = false
+
+lol50Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol51Button = createButtonBelow("51", frame1)
+lol51Button.Size = UDim2.new(0, 175, 0, 23)
+lol51Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol51Button.TextSize = 10
+lol51Button.Visible = false
+
+lol51Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol52Button = createButtonBelow("52", frame1)
+lol52Button.Size = UDim2.new(0, 175, 0, 23)
+lol52Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol52Button.TextSize = 10
+lol52Button.Visible = false
+
+lol52Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol53Button = createButtonBelow("53", frame1)
+lol53Button.Size = UDim2.new(0, 175, 0, 23)
+lol53Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol53Button.TextSize = 10
+lol53Button.Visible = false
+
+lol53Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol54Button = createButtonBelow("54", frame1)
+lol54Button.Size = UDim2.new(0, 175, 0, 23)
+lol54Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol54Button.TextSize = 10
+lol54Button.Visible = false
+
+lol54Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol55Button = createButtonBelow("55", frame1)
+lol55Button.Size = UDim2.new(0, 175, 0, 23)
+lol55Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol55Button.TextSize = 10
+lol55Button.Visible = false
+
+lol55Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol56Button = createButtonBelow("56", frame1)
+lol56Button.Size = UDim2.new(0, 175, 0, 23)
+lol56Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol56Button.TextSize = 10
+lol56Button.Visible = false
+
+lol56Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol57Button = createButtonBelow("57", frame1)
+lol57Button.Size = UDim2.new(0, 195, 0, 23)
+lol57Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol57Button.TextSize = 10
+lol57Button.Visible = false
+
+lol57Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol58Button = createButtonBelow("58", frame1)
+lol58Button.Size = UDim2.new(0, 195, 0, 23)
+lol58Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol58Button.TextSize = 10
+lol58Button.Visible = false
+
+lol58Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol59Button = createButtonBelow("59", frame1)
+lol59Button.Size = UDim2.new(0, 195, 0, 23)
+lol59Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol59Button.TextSize = 10
+lol59Button.Visible = false
+
+lol59Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol60Button = createButtonBelow("60", frame1)
+lol60Button.Size = UDim2.new(0, 195, 0, 23)
+lol60Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol60Button.TextSize = 10
+lol60Button.Visible = false
+
+lol60Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol61Button = createButtonBelow("61", frame1)
+lol61Button.Size = UDim2.new(0, 195, 0, 23)
+lol61Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol61Button.TextSize = 10
+lol61Button.Visible = false
+
+lol61Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol62Button = createButtonBelow("62", frame1)
+lol62Button.Size = UDim2.new(0, 195, 0, 23)
+lol62Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol62Button.TextSize = 10
+lol62Button.Visible = false
+
+lol62Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol63Button = createButtonBelow("63", frame1)
+lol63Button.Size = UDim2.new(0, 195, 0, 23)
+lol63Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol63Button.TextSize = 10
+lol63Button.Visible = false
+
+lol63Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol64Button = createButtonBelow("64", frame1)
+lol64Button.Size = UDim2.new(0, 195, 0, 23)
+lol64Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol64Button.TextSize = 10
+lol64Button.Visible = false
+
+lol64Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+-- tab7
+
+local lol65Button = createButtonBelow("65", frame1)
+lol65Button.Size = UDim2.new(0, 175, 0, 23)
+lol65Button.TextSize = 10
+lol65Button.Visible = false
+
+lol65Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol66Button = createButtonBelow("66", frame1)
+lol66Button.Size = UDim2.new(0, 175, 0, 23)
+lol66Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol66Button.TextSize = 10
+lol66Button.Visible = false
+
+lol66Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol67Button = createButtonBelow("67", frame1)
+lol67Button.Size = UDim2.new(0, 175, 0, 23)
+lol67Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol67Button.TextSize = 10
+lol67Button.Visible = false
+
+lol67Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol68Button = createButtonBelow("68", frame1)
+lol68Button.Size = UDim2.new(0, 175, 0, 23)
+lol68Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol68Button.TextSize = 10
+lol68Button.Visible = false
+
+lol68Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol69Button = createButtonBelow("69", frame1)
+lol69Button.Size = UDim2.new(0, 175, 0, 23)
+lol69Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol69Button.TextSize = 10
+lol69Button.Visible = false
+
+lol69Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol70Button = createButtonBelow("70", frame1)
+lol70Button.Size = UDim2.new(0, 175, 0, 23)
+lol70Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol70Button.TextSize = 10
+lol70Button.Visible = false
+
+lol70Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol71Button = createButtonBelow("67", frame1)
+lol71Button.Size = UDim2.new(0, 175, 0, 23)
+lol71Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol71Button.TextSize = 10
+lol71Button.Visible = false
+
+lol71Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol72Button = createButtonBelow("72", frame1)
+lol72Button.Size = UDim2.new(0, 175, 0, 23)
+lol72Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol72Button.TextSize = 10
+lol72Button.Visible = false
+
+lol72Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol73Button = createButtonBelow("73", frame1)
+lol73Button.Size = UDim2.new(0, 195, 0, 23)
+lol73Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol73Button.TextSize = 10
+lol73Button.Visible = false
+
+lol73Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol74Button = createButtonBelow("74", frame1)
+lol74Button.Size = UDim2.new(0, 195, 0, 23)
+lol74Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol74Button.TextSize = 10
+lol74Button.Visible = false
+
+lol74Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol75Button = createButtonBelow("75", frame1)
+lol75Button.Size = UDim2.new(0, 195, 0, 23)
+lol75Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol75Button.TextSize = 10
+lol75Button.Visible = false
+
+lol75Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol76Button = createButtonBelow("76", frame1)
+lol76Button.Size = UDim2.new(0, 195, 0, 23)
+lol76Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol76Button.TextSize = 10
+lol76Button.Visible = false
+
+lol76Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol77Button = createButtonBelow("77", frame1)
+lol77Button.Size = UDim2.new(0, 195, 0, 23)
+lol77Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol77Button.TextSize = 10
+lol77Button.Visible = false
+
+lol77Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol78Button = createButtonBelow("78", frame1)
+lol78Button.Size = UDim2.new(0, 195, 0, 23)
+lol78Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol78Button.TextSize = 10
+lol78Button.Visible = false
+
+lol78Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol79Button = createButtonBelow("79", frame1)
+lol79Button.Size = UDim2.new(0, 195, 0, 23)
+lol79Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol79Button.TextSize = 10
+lol79Button.Visible = false
+
+lol79Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol80Button = createButtonBelow("80", frame1)
+lol80Button.Size = UDim2.new(0, 195, 0, 23)
+lol80Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol80Button.TextSize = 10
+lol80Button.Visible = false
+
+lol80Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+-- tab 8
+
+local lol81Button = createButtonBelow("81", frame1)
+lol81Button.Size = UDim2.new(0, 175, 0, 23)
+lol81Button.TextSize = 10
+lol81Button.Visible = false
+
+lol81Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol82Button = createButtonBelow("82", frame1)
+lol82Button.Size = UDim2.new(0, 175, 0, 23)
+lol82Button.Position = UDim2.new(0.5, -135, 0, 70)
+lol82Button.TextSize = 10
+lol82Button.Visible = false
+
+lol82Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol83Button = createButtonBelow("83", frame1)
+lol83Button.Size = UDim2.new(0, 175, 0, 23)
+lol83Button.Position = UDim2.new(0.5, -135, 0, 95)
+lol83Button.TextSize = 10
+lol83Button.Visible = false
+
+lol83Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol84Button = createButtonBelow("84", frame1)
+lol84Button.Size = UDim2.new(0, 175, 0, 23)
+lol84Button.Position = UDim2.new(0.5, -135, 0, 120)
+lol84Button.TextSize = 10
+lol84Button.Visible = false
+
+lol84Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol85Button = createButtonBelow("85", frame1)
+lol85Button.Size = UDim2.new(0, 175, 0, 23)
+lol85Button.Position = UDim2.new(0.5, -135, 0, 145)
+lol85Button.TextSize = 10
+lol85Button.Visible = false
+
+lol85Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol86Button = createButtonBelow("86", frame1)
+lol86Button.Size = UDim2.new(0, 175, 0, 23)
+lol86Button.Position = UDim2.new(0.5, -135, 0, 170)
+lol86Button.TextSize = 10
+lol86Button.Visible = false
+
+lol86Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol87Button = createButtonBelow("87", frame1)
+lol87Button.Size = UDim2.new(0, 175, 0, 23)
+lol87Button.Position = UDim2.new(0.5, -135, 0, 195)
+lol87Button.TextSize = 10
+lol87Button.Visible = false
+
+lol87Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol88Button = createButtonBelow("88", frame1)
+lol88Button.Size = UDim2.new(0, 175, 0, 23)
+lol88Button.Position = UDim2.new(0.5, -135, 0, 220)
+lol88Button.TextSize = 10
+lol88Button.Visible = false
+
+lol88Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol89Button = createButtonBelow("89", frame1)
+lol89Button.Size = UDim2.new(0, 195, 0, 23)
+lol89Button.Position = UDim2.new(0.5, 50, 0, 45)
+lol89Button.TextSize = 10
+lol89Button.Visible = false
+
+lol89Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol90Button = createButtonBelow("90", frame1)
+lol90Button.Size = UDim2.new(0, 195, 0, 23)
+lol90Button.Position = UDim2.new(0.5, 50, 0, 70)
+lol90Button.TextSize = 10
+lol90Button.Visible = false
+
+lol90Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol91Button = createButtonBelow("91", frame1)
+lol91Button.Size = UDim2.new(0, 195, 0, 23)
+lol91Button.Position = UDim2.new(0.5, 50, 0, 95)
+lol91Button.TextSize = 10
+lol91Button.Visible = false
+
+lol91Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol92Button = createButtonBelow("92", frame1)
+lol92Button.Size = UDim2.new(0, 195, 0, 23)
+lol92Button.Position = UDim2.new(0.5, 50, 0, 120)
+lol92Button.TextSize = 10
+lol92Button.Visible = false
+
+lol92Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol93Button = createButtonBelow("93", frame1)
+lol93Button.Size = UDim2.new(0, 195, 0, 23)
+lol93Button.Position = UDim2.new(0.5, 50, 0, 145)
+lol93Button.TextSize = 10
+lol93Button.Visible = false
+
+lol93Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol94Button = createButtonBelow("94", frame1)
+lol94Button.Size = UDim2.new(0, 195, 0, 23)
+lol94Button.Position = UDim2.new(0.5, 50, 0, 170)
+lol94Button.TextSize = 10
+lol94Button.Visible = false
+
+lol94Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol95Button = createButtonBelow("95", frame1)
+lol95Button.Size = UDim2.new(0, 195, 0, 23)
+lol95Button.Position = UDim2.new(0.5, 50, 0, 195)
+lol95Button.TextSize = 10
+lol95Button.Visible = false
+
+lol95Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local lol96Button = createButtonBelow("96", frame1)
+lol96Button.Size = UDim2.new(0, 195, 0, 23)
+lol96Button.Position = UDim2.new(0.5, 50, 0, 220)
+lol96Button.TextSize = 10
+lol96Button.Visible = false
+
+lol96Button.MouseButton1Click:Connect(
+    function()
+    end
+)
+
+local tab1 = createTabButton("|Suslik Hub|", UDim2.new(0, 5, 0, 45))
+
+local firstButton = createButtonBelow("Creators", frame1)
+firstButton.Size = UDim2.new(0, 175, 0, 40)
+firstButton.TextSize = 21
+firstButton.Visible = false
+
+local secondButton = createButtonBelow("Owner: Krutoy Suslik", frame1, firstButton)
+secondButton.Size = UDim2.new(0, 175, 0, 20)
+secondButton.Visible = false
+
+local popButton = createButtonBelow("Assistant: Krain", frame1, firstButton)
+popButton.Size = UDim2.new(0, 175, 0, 20)
+popButton.Position = UDim2.new(0.5, -135, 0, 105)
+popButton.Visible = false
+
+local rotButton = createButtonBelow("Social Networks", frame1)
+rotButton.Size = UDim2.new(0, 175, 0, 40)
+rotButton.Position = UDim2.new(0.5, -135, 0, 130)
+rotButton.TextSize = 14
+rotButton.Visible = false
+
+local tgButton = createButtonBelow("Telegram Channel", frame1, firstButton)
+tgButton.Size = UDim2.new(0, 175, 0, 20)
+tgButton.Position = UDim2.new(0.5, -135, 0, 170)
+tgButton.Visible = false
+
+tgButton.MouseButton1Click:Connect(
+    function()
+        setclipboard(t.me / KrutoySuslik)
+    end
+)
+
+local thButton = createButtonBelow("https://t.me/KrutoySuslik", frame1, firstButton)
+thButton.Size = UDim2.new(0, 175, 0, 20)
+thButton.Position = UDim2.new(0.5, -135, 0, 190)
+thButton.Visible = false
+
+thButton.MouseButton1Click:Connect(
+    function()
+        setclipboard("https://t.me/KrutoySuslik")
+    end
+)
+
+local dsButton = createButtonBelow("Discord Server", frame1, firstButton)
+dsButton.Size = UDim2.new(0, 175, 0, 20)
+dsButton.Position = UDim2.new(0.5, -135, 0, 215)
+dsButton.Visible = false
+
+local dhButton = createButtonBelow("https://discord.com/invite/suslikhub", frame1, firstButton)
+dhButton.Size = UDim2.new(0, 175, 0, 20)
+dhButton.Position = UDim2.new(0.5, -135, 0, 235)
+dhButton.TextSize = 7
+dhButton.Visible = false
+
+dhButton.MouseButton1Click:Connect(
+    function()
+        setclipboard("https://discord.com/invite/suslikhub")
+    end
+)
+
+local ytButton = createButtonBelow("YouTube", frame1, firstButton)
+ytButton.Size = UDim2.new(0, 195, 0, 20)
+ytButton.Position = UDim2.new(0.5, 53, 0, 45)
+ytButton.Visible = false
+
+local yytButton = createButtonBelow("https://youtube.com/@Krutoy-Suslik", frame1, firstButton)
+yytButton.Size = UDim2.new(0, 195, 0, 20)
+yytButton.Position = UDim2.new(0.5, 53, 0, 65)
+yytButton.TextSize = 8
+yytButton.Visible = false
+
+yytButton.MouseButton1Click:Connect(
+    function()
+        setclipboard("https://youtube.com/@Krutoy-Suslik")
+    end
+)
+
+local tyButton = createButtonBelow("https://youtube.com/@Krutoy-Suslik?si=3kQJQjiN6knpjUI8", frame1, firstButton)
+tyButton.Size = UDim2.new(0, 195, 0, 20)
+tyButton.Position = UDim2.new(0.5, 53, 0, 85)
+tyButton.TextSize = 5
+tyButton.Visible = false
+
+tyButton.MouseButton1Click:Connect(
+    function()
+        setclipboard("https://youtube.com/@Krutoy-Suslik?si=3kQJQjiN6knpjUI8")
+    end
+)
+
+local supButton = createButtonBelow("Support", frame1, firstButton)
+supButton.Size = UDim2.new(0, 195, 0, 30)
+supButton.Position = UDim2.new(0.5, 53, 0, 110)
+supButton.TextSize = 15
+supButton.Visible = false
+
+local suButton = createButtonBelow("t.me/Krutoy_Suslik_Support", frame1, firstButton)
+suButton.Size = UDim2.new(0, 195, 0, 20)
+suButton.Position = UDim2.new(0.5, 53, 0, 140)
+suButton.TextSize = 10
+suButton.Visible = false
+
+suButton.MouseButton1Click:Connect(
+    function()
+        setclipboard("t.me/Krutoy_Suslik_Support")
+    end
+)
+
+local vButton = createButtonBelow("Version: 1.1.1", frame1, firstButton)
+vButton.Size = UDim2.new(0, 195, 0, 20)
+vButton.Position = UDim2.new(0.5, 53, 0, 235)
+vButton.TextSize = 12
+vButton.Visible = false
+
+tab1.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = true
+        secondButton.Visible = true
+        popButton.Visible = true
+        rotButton.Visible = true
+        tgButton.Visible = true
+        thButton.Visible = true
+        dsButton.Visible = true
+        dhButton.Visible = true
+        ytButton.Visible = true
+        yytButton.Visible = true
+        tyButton.Visible = true
+        supButton.Visible = true
+        suButton.Visible = true
+        vButton.Visible = true
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab2 = createTabButton("Script|Settings", UDim2.new(0, 5, 0, 70))
+
+tab2.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = true
+        wButton.Visible = true
+        v2Button.Visible = true
+        oButton.Visible = true
+        piButton.Visible = true
+        poButton.Visible = true
+        rtxButton.Visible = true
+        flyButton.Visible = true
+        shButton.Visible = true
+        setButton.Visible = true
+        v6Button.Visible = true
+        colorButton.Visible = true
+        col1button.Visible = true
+        col2button.Visible = true
+        col3button.Visible = true
+        col4button.Visible = true
+        col5button.Visible = true
+        col6button.Visible = true
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab3 = createTabButton("Scripts", UDim2.new(0, 5, 0, 95))
+
+tab3.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = true
+        lol2Button.Visible = true
+        lol3Button.Visible = true
+        lol4Button.Visible = true
+        lol5Button.Visible = true
+        lol6Button.Visible = true
+        lol7Button.Visible = true
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab4 = createTabButton("4", UDim2.new(0, 5, 0, 120))
+tab4.Visible = false
+
+tab4.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = true
+        lol18Button.Visible = true
+        lol19Button.Visible = true
+        lol20Button.Visible = true
+        lol21Button.Visible = true
+        lol22Button.Visible = true
+        lol23Button.Visible = true
+        lol24Button.Visible = true
+        lol25Button.Visible = true
+        lol26Button.Visible = true
+        lol27Button.Visible = true
+        lol28Button.Visible = true
+        lol29Button.Visible = true
+        lol30Button.Visible = true
+        lol31Button.Visible = true
+        lol32Button.Visible = true
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab5 = createTabButton("5", UDim2.new(0, 5, 0, 145))
+tab5.Visible = false
+tab5.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = true
+        lol34Button.Visible = true
+        lol35Button.Visible = true
+        lol36Button.Visible = true
+        lol37Button.Visible = true
+        lol38Button.Visible = true
+        lol39Button.Visible = true
+        lol40Button.Visible = true
+        lol41Button.Visible = true
+        lol42Button.Visible = true
+        lol43Button.Visible = true
+        lol44Button.Visible = true
+        lol45Button.Visible = true
+        lol46Button.Visible = true
+        lol47Button.Visible = true
+        lol48Button.Visible = true
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab6 = createTabButton("6", UDim2.new(0, 5, 0, 170))
+tab6.Visible = false
+tab6.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = true
+        lol50Button.Visible = true
+        lol51Button.Visible = true
+        lol52Button.Visible = true
+        lol52Button.Visible = true
+        lol53Button.Visible = true
+        lol54Button.Visible = true
+        lol55Button.Visible = true
+        lol56Button.Visible = true
+        lol57Button.Visible = true
+        lol58Button.Visible = true
+        lol59Button.Visible = true
+        lol60Button.Visible = true
+        lol61Button.Visible = true
+        lol62Button.Visible = true
+        lol62Button.Visible = true
+        lol63Button.Visible = true
+        lol64Button.Visible = true
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab7 = createTabButton("7", UDim2.new(0, 5, 0, 195))
+tab7.Visible = false
+tab7.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = false
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = false
+        lol65Button.Visible = true
+        lol66Button.Visible = true
+        lol67Button.Visible = true
+        lol68Button.Visible = true
+        lol69Button.Visible = true
+        lol70Button.Visible = true
+        lol71Button.Visible = true
+        lol72Button.Visible = true
+        lol73Button.Visible = true
+        lol73Button.Visible = true
+        lol74Button.Visible = true
+        lol75Button.Visible = true
+        lol76Button.Visible = true
+        lol77Button.Visible = true
+        lol78Button.Visible = true
+        lol79Button.Visible = true
+        lol80Button.Visible = true
+        lol81Button.Visible = false
+        lol82Button.Visible = false
+        lol83Button.Visible = false
+        lol84Button.Visible = false
+        lol85Button.Visible = false
+        lol86Button.Visible = false
+        lol87Button.Visible = false
+        lol88Button.Visible = false
+        lol89Button.Visible = false
+        lol90Button.Visible = false
+        lol91Button.Visible = false
+        lol92Button.Visible = false
+        lol93Button.Visible = false
+        lol94Button.Visible = false
+        lol95Button.Visible = false
+        lol96Button.Visible = false
+    end
+)
+
+local tab8 = createTabButton("8", UDim2.new(0, 5, 0, 45))
+tab8.Visible = false
+
+tab8.MouseButton1Click:Connect(
+    function()
+        frame5.Visible = true
+        firstButton.Visible = false
+        secondButton.Visible = false
+        popButton.Visible = false
+        rotButton.Visible = false
+        tgButton.Visible = false
+        thButton.Visible = false
+        dsButton.Visible = false
+        dhButton.Visible = false
+        ytButton.Visible = false
+        yytButton.Visible = false
+        tyButton.Visible = false
+        supButton.Visible = false
+        suButton.Visible = false
+        vButton.Visible = false
+        jButton.Visible = false
+        wButton.Visible = false
+        v2Button.Visible = false
+        oButton.Visible = false
+        piButton.Visible = false
+        poButton.Visible = false
+        rtxButton.Visible = false
+        flyButton.Visible = false
+        shButton.Visible = false
+        setButton.Visible = false
+        v6Button.Visible = false
+        colorButton.Visible = false
+        col1button.Visible = false
+        col2button.Visible = false
+        col3button.Visible = false
+        col4button.Visible = false
+        col5button.Visible = false
+        col6button.Visible = false
+        lolButton.Visible = false
+        lol2Button.Visible = false
+        lol3Button.Visible = false
+        lol4Button.Visible = false
+        lol5Button.Visible = false
+        lol6Button.Visible = false
+        lol7Button.Visible = false
+        lol8Button.Visible = false
+        lol9Button.Visible = false
+        lol10Button.Visible = false
+        lol11Button.Visible = false
+        lol12Button.Visible = false
+        lol13Button.Visible = false
+        lol14Button.Visible = false
+        lol15Button.Visible = false
+        lol16Button.Visible = false
+        lol17Button.Visible = false
+        lol18Button.Visible = false
+        lol19Button.Visible = false
+        lol20Button.Visible = false
+        lol21Button.Visible = false
+        lol22Button.Visible = false
+        lol23Button.Visible = false
+        lol24Button.Visible = false
+        lol25Button.Visible = false
+        lol26Button.Visible = false
+        lol27Button.Visible = false
+        lol28Button.Visible = false
+        lol29Button.Visible = false
+        lol30Button.Visible = false
+        lol31Button.Visible = false
+        lol32Button.Visible = false
+        lol33Button.Visible = false
+        lol34Button.Visible = false
+        lol35Button.Visible = false
+        lol36Button.Visible = false
+        lol37Button.Visible = false
+        lol38Button.Visible = false
+        lol39Button.Visible = false
+        lol40Button.Visible = false
+        lol41Button.Visible = false
+        lol42Button.Visible = false
+        lol43Button.Visible = false
+        lol44Button.Visible = false
+        lol45Button.Visible = false
+        lol46Button.Visible = false
+        lol47Button.Visible = false
+        lol48Button.Visible = false
+        lol49Button.Visible = true
+        lol50Button.Visible = false
+        lol51Button.Visible = false
+        lol52Button.Visible = false
+        lol52Button.Visible = false
+        lol53Button.Visible = false
+        lol54Button.Visible = false
+        lol55Button.Visible = false
+        lol56Button.Visible = false
+        lol57Button.Visible = false
+        lol58Button.Visible = false
+        lol59Button.Visible = false
+        lol60Button.Visible = false
+        lol61Button.Visible = false
+        lol62Button.Visible = false
+        lol62Button.Visible = false
+        lol63Button.Visible = false
+        lol64Button.Visible = true
+        lol65Button.Visible = false
+        lol66Button.Visible = false
+        lol67Button.Visible = false
+        lol68Button.Visible = false
+        lol69Button.Visible = false
+        lol70Button.Visible = false
+        lol71Button.Visible = false
+        lol72Button.Visible = false
+        lol73Button.Visible = false
+        lol73Button.Visible = false
+        lol74Button.Visible = false
+        lol75Button.Visible = false
+        lol76Button.Visible = false
+        lol77Button.Visible = false
+        lol78Button.Visible = false
+        lol79Button.Visible = false
+        lol80Button.Visible = false
+        lol81Button.Visible = true
+        lol82Button.Visible = true
+        lol83Button.Visible = true
+        lol84Button.Visible = true
+        lol85Button.Visible = true
+        lol86Button.Visible = true
+        lol87Button.Visible = true
+        lol88Button.Visible = true
+        lol89Button.Visible = true
+        lol90Button.Visible = true
+        lol91Button.Visible = true
+        lol92Button.Visible = true
+        lol93Button.Visible = true
+        lol94Button.Visible = true
+        lol95Button.Visible = true
+        lol96Button.Visible = true
+    end
+)
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 30, 0, 30)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.Text = " "
+toggleButton.BackgroundTransparency = 1
+toggleButton.Parent = frame99
+
+local menuOpen = false
+
+local function toggleMenu()
+    if menuOpen then
+        frame1:TweenPosition(UDim2.new(0.5, -250, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Back, 1, true)
+        menuOpen = false
+    else
+        frame1:TweenPosition(UDim2.new(0.5, -250, 0.5, -130), Enum.EasingDirection.Out, Enum.EasingStyle.Back, 1, true)
+        menuOpen = true
+    end
+end
+
+toggleButton.MouseButton1Click:Connect(toggleMenu)
